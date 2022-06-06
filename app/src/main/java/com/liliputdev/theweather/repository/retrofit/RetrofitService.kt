@@ -4,19 +4,25 @@ import com.liliputdev.theweather.repository.retrofit.apiModel.searchByCity.ApiMo
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Path
+import com.google.gson.GsonBuilder
+
+import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import retrofit2.http.*
+
 
 interface RetrofitService {
 
     companion object {
         var retrofitService: RetrofitService? = null
-
+        var gson = GsonBuilder()
+            .setLenient()
+            .create()
         fun getInstance(): RetrofitService {
             if (retrofitService == null) {
                 val retrofit = Retrofit.Builder()
                     .baseUrl("https://community-open-weather-map.p.rapidapi.com/")
+                    .client(OkHttpClient())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 retrofitService = retrofit.create(RetrofitService::class.java)
@@ -25,10 +31,10 @@ interface RetrofitService {
         }
     }
 
-    @GET("weather?q={city}&lat=0&lon=0&callback=test&id=2172797&lang=null&units=imperial&mode=xml")
+    @GET("weather?")
     fun searchByCity(
-        @Path("city") city: String,
+        @Query("q") city: String,
         @Header("X-RapidAPI-Host") host: String,
-        @Header("X-RapidAPI-Key") key: String,
+        @Header("X-RapidAPI-Key") key: String
     ): Call<ApiModelSearchByModel>
 }
