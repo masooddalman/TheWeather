@@ -1,9 +1,8 @@
 package com.liliputdev.theweather.repository.retrofit.apiModel.searchByCity
 
-data class Sys(
+data class ApiModelSearchedCityItem(
     val country: String,
-    val id: Int,
-    val sunrise: Int,
-    val sunset: Int,
-    val type: Int
+    val lat: Double,
+    val lon: Double,
+    val name: String
 )
