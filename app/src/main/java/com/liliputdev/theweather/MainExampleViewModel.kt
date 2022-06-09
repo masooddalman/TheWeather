@@ -1,80 +1,85 @@
 package com.liliputdev.theweather
 
+import android.R
+import android.content.Context
 import android.util.Log
+import android.widget.ArrayAdapter
 import androidx.databinding.BaseObservable
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
+import com.chad.library.adapter.base.listener.OnItemClickListener
 import com.liliputdev.theweather.repository.WebRepository
-import com.liliputdev.theweather.repository.retrofit.apiModel.searchByCity.ApiModelSearchByModel
+import com.liliputdev.theweather.repository.retrofit.apiModel.searchByCity.ApiModelSearchedCity
+import com.liliputdev.theweather.repository.retrofit.apiModel.searchByCity.ApiModelSearchedCityItem
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 
-class MainExampleViewModel constructor(private val repository: WebRepository) : BaseObservable() {
-    val searchedCityByName = MutableLiveData<ApiModelSearchByModel>()
-    val searchedCityError = MutableLiveData<String>()
-    private val inputCity = ObservableField<String>("Istanbul")
-    private val inputCityError = ObservableField<String>("")
-    private val isErrorEnable = ObservableBoolean(false)
+class MainExampleViewModel(private val context: Context, private val repository: WebRepository) :
+    BaseObservable() {
 
+    var searchCityInputValue = MutableLiveData<String>()
+    var searchCityInputError = MutableLiveData<String>()
+    var searchCityInputErrorEnable = MutableLiveData<Boolean>()
 
-    fun setInputCity(value: String) {
-        inputCity.set(value)
+    var citySuggestionAdapter = MutableLiveData<CitySuggestionAdapter>()
+
+    init {
+        citySuggestionAdapter.postValue(CitySuggestionAdapter())
+
+        citySuggestionAdapter.value?.setOnItemClickListener { _adapter, _view, _position ->
+            citySuggestionAdapter.value?.let {
+                    item ->
+                 searchCityInputValue.postValue(item.data[_position].name)
+                    citySuggestionAdapter.value?.data?.clear();
+                    citySuggestionAdapter.value?.notifyDataSetChanged()
+
+            }
+        }
+
     }
 
-    fun getInputCity(): ObservableField<String> {
-        return inputCity
-    }
-
-
-    fun setInputCityError(value: String) {
-        inputCityError.set(value)
-    }
-
-    fun getInputCityError(): ObservableField<String> {
-        return inputCityError
-    }
-
-
-    fun setIsErrorEnable(value: Boolean) {
-        isErrorEnable.set(value)
-    }
-
-    fun getIsErrorEnable(): ObservableBoolean {
-        return isErrorEnable
-    }
 
     fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         when {
             s.isEmpty() -> {
-                setIsErrorEnable(true)
-                setInputCityError("please insert city name")
+                searchCityInputErrorEnable.postValue(true)
+                searchCityInputError.postValue("please insert city name")
             }
             s.length < 3 -> {
-                setInputCityError("at least 3 character needs")
-                setIsErrorEnable(true)
+                searchCityInputError.postValue("at least 3 character needs")
+                searchCityInputErrorEnable.postValue(true)
+                citySuggestionAdapter.value?.data?.clear();
+                citySuggestionAdapter.value?.notifyDataSetChanged()
             }
             else -> {
-                setInputCityError("")
-                setIsErrorEnable(false)
+                searchCityInputError.postValue("")
+                searchCityInputErrorEnable.postValue(false)
+                // search for city in google place
+                searchCity(s.toString())
             }
         }
     }
 
-    fun searchWeatherByCity(city: String) {
+    private fun searchCity(city: String) {
+        Log.v("masood", "text to search city : $city")
         val response = repository.searchByCity(city)
-        response.enqueue(object : Callback<ApiModelSearchByModel> {
+        response.enqueue(object : Callback<ApiModelSearchedCity> {
             override fun onResponse(
-                call: Call<ApiModelSearchByModel>,
-                response: Response<ApiModelSearchByModel>
+                call: Call<ApiModelSearchedCity>,
+                response: Response<ApiModelSearchedCity>
             ) {
-                searchedCityByName.postValue(response.body())
+                Log.v("masood", "response : ${response.body()}")
+                response.body()?.let { list ->
+                    citySuggestionAdapter.value?.setNewInstance(list)
+                    citySuggestionAdapter.value?.notifyDataSetChanged()
+                }
             }
 
-            override fun onFailure(call: Call<ApiModelSearchByModel>, t: Throwable) {
-                searchedCityError.postValue(t.message)
+            override fun onFailure(call: Call<ApiModelSearchedCity>, t: Throwable) {
+                Log.v("masood", "cannot find city \n $t")
             }
         })
     }

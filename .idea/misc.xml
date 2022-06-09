@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/androidStudioProject/theWeather/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/androidStudioProject/theWeather/app/src/main/res/layout/item_city_suggestion.xml" value="0.5" />
       </map>
     </option>
   </component>

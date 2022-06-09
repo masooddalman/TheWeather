@@ -1,12 +1,17 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.liliputdev.theweather.MainExampleViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
@@ -15,32 +20,53 @@
             android:id="@+id/username_text_input_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:errorEnabled="@{viewModel.isErrorEnable}"
-            app:errorText="@{viewModel.inputCityError}"
+            app:errorEnabled="@{viewModel.searchCityInputErrorEnable}"
+            app:errorText="@{viewModel.searchCityInputError}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:startIconDrawable="@drawable/ic_add_location"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconDrawable="@drawable/ic_add_location">
 
+            <!-- <androidx.appcompat.widget.AppCompatAutoCompleteTextView
+                 android:id="@+id/autoComplete"
+                 style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:hint="Search for location"
+                 android:onTextChanged="@{viewModel.onTextChanged}"
+                 android:text="@={viewModel.searchCityInputValue}"
+                 android:adapter="@{viewModel.citySuggestionAdapter}"
+                 />-->
             <EditText
                 android:id="@+id/etUsername"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:autofillHints="auto fill hints"
                 android:hint="Search for location"
+                android:inputType="textAutoComplete"
                 android:maxLines="1"
                 android:minLines="1"
-                android:text="@={viewModel.inputCity}"
                 android:onTextChanged="@{viewModel.onTextChanged}"
-                android:inputType="textAutoComplete" />
+                android:text="@={viewModel.searchCityInputValue}" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:adapter="@{viewModel.citySuggestionAdapter}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/username_text_input_layout" />
 
         <TextView
             android:id="@+id/textViewExample"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.inputCity}"
+            android:text="@{viewModel.searchCityInputValue}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

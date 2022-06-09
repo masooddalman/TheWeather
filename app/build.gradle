@@ -64,4 +64,7 @@ dependencies {
 
     //kotlin coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2")
+
+    //adapter
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
 }
